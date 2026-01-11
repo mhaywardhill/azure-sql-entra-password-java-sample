@@ -1,5 +1,5 @@
 
-# Azure SQL Java sample — Entra Password authentication (Codespaces-ready)
+# Azure SQL Java sample — Entra Password authentication
 
 This is a minimal Java 17 + Maven console app that connects to **Azure SQL Database** using **Microsoft Entra (Azure AD) password authentication** via the Microsoft JDBC Driver for SQL Server. It works in **GitHub Codespaces** and on any **Linux VM** with Java and Maven installed.
 
@@ -9,7 +9,7 @@ This is a minimal Java 17 + Maven console app that connects to **Azure SQL Datab
 
 ## Prerequisites
 1. **Azure SQL Database** and **server** (e.g., `yourserver.database.windows.net`).
-2. A **Microsoft Entra user** (UPN, e.g., `user@contoso.com`) that:
+2. A **Microsoft Entra user** (UPN, e.g., `your-entra-email@domain.com`) that:
    - Has a **password** set (not only MFA/SSPR enforced at sign-in).
    - Is **created as a contained database user** and has permissions in your database.
 3. Network access to the Azure SQL server on **TCP 1433** from your environment (Codespaces or your Linux VM).
@@ -106,25 +106,14 @@ export JDBC_TRACE_LEVEL="DEBUG"  # or TRACE, INFO, WARN
 
 ### Log levels
 
-You can adjust the logging detail via the `JDBC_TRACE_LEVEL` environment variable or by editing [src/main/resources/logback.xml](src/main/resources/logback.xml):
+You can adjust the logging detail via the `JDBC_TRACE_LEVEL` environment variable:
 
 - **TRACE**: Most detailed - packet-level operations, method entry/exit
 - **DEBUG**: SQL statements, connection events, driver operations
 - **INFO**: Basic driver information (default)
 - **WARN**: Warnings and errors only
 
-Example configuration in logback.xml:
-
-```xml
-<!-- Set to TRACE for detailed driver operations -->
-<logger name="com.microsoft.sqlserver.jdbc" level="TRACE"/>
-```
-
-### Alternative: Java Util Logging
-
-The driver also supports java.util.logging. A configuration file is provided at [src/main/resources/logging.properties](src/main/resources/logging.properties). This is automatically used when `JDBC_TRACE=true` is set.
-
-For more information, see [Microsoft's documentation on tracing driver operations](https://learn.microsoft.com/en-us/sql/connect/jdbc/tracing-driver-operation).
+The application uses Java Util Logging (java.util.logging) and configures it programmatically when `JDBC_TRACE=true` is set. For more information, see [Microsoft's documentation on tracing driver operations](https://learn.microsoft.com/en-us/sql/connect/jdbc/tracing-driver-operation).
 
 ## Troubleshooting
 - **MFA required / Conditional Access**: `ActiveDirectoryPassword` does **not** support MFA. Use a non-MFA test user, exclude the user from the MFA policy, or switch to **Managed Identity / Service Principal + access token** authentication.

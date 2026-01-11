@@ -9,4 +9,4 @@ set -euo pipefail
 : "${AZURE_SQL_PASSWORD:?set AZURE_SQL_PASSWORD}"
 
 mvn -q -DskipTests package
-mvn -q exec:java
+java -jar target/azure-sql-entra-password-java-sample-1.0.0.jar

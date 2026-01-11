@@ -78,37 +78,8 @@ public class EntraPasswordSqlSample {
     private static void configureJdbcLogging(String level) {
         System.out.println("JDBC driver tracing enabled at level: " + level);
         
-        // Configure Logback logger programmatically using reflection to avoid compile-time dependencies
-        try {
-            Class<?> loggerClass = Class.forName("ch.qos.logback.classic.Logger");
-            Class<?> levelClass = Class.forName("ch.qos.logback.classic.Level");
-            
-            Object jdbcLogger = org.slf4j.LoggerFactory.getLogger("com.microsoft.sqlserver.jdbc");
-            
-            Object logbackLevel;
-            switch (level) {
-                case "TRACE":
-                    logbackLevel = levelClass.getField("TRACE").get(null);
-                    break;
-                case "DEBUG":
-                    logbackLevel = levelClass.getField("DEBUG").get(null);
-                    break;
-                case "WARN":
-                case "WARNING":
-                    logbackLevel = levelClass.getField("WARN").get(null);
-                    break;
-                case "INFO":
-                default:
-                    logbackLevel = levelClass.getField("INFO").get(null);
-                    break;
-            }
-            
-            loggerClass.getMethod("setLevel", levelClass).invoke(jdbcLogger, logbackLevel);
-        } catch (Exception e) {
-            System.err.println("Could not configure Logback logging: " + e.getMessage());
-        }
-        
-        // Also configure java.util.logging for alternative logging
+        // The Microsoft JDBC Driver uses java.util.logging
+        // Configure java.util.logging with console handler
         try {
             java.util.logging.Level julLevel;
             switch (level) {
@@ -127,9 +98,27 @@ public class EntraPasswordSqlSample {
                     julLevel = java.util.logging.Level.INFO;
                     break;
             }
-            java.util.logging.Logger.getLogger("com.microsoft.sqlserver.jdbc").setLevel(julLevel);
+            
+            // Configure the JDBC driver logger
+            java.util.logging.Logger jdbcLogger = java.util.logging.Logger.getLogger("com.microsoft.sqlserver.jdbc");
+            jdbcLogger.setLevel(julLevel);
+            
+            // Configure console handler to show the output
+            java.util.logging.ConsoleHandler consoleHandler = new java.util.logging.ConsoleHandler();
+            consoleHandler.setLevel(julLevel);
+            consoleHandler.setFormatter(new java.util.logging.SimpleFormatter());
+            
+            // Remove existing handlers and add our console handler
+            jdbcLogger.setUseParentHandlers(false);
+            for (java.util.logging.Handler handler : jdbcLogger.getHandlers()) {
+                jdbcLogger.removeHandler(handler);
+            }
+            jdbcLogger.addHandler(consoleHandler);
+            
+            System.out.println("Java util logging configured for JDBC driver");
         } catch (Exception e) {
             System.err.println("Could not configure java.util.logging: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
