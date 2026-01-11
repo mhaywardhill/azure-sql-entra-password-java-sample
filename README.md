@@ -21,10 +21,10 @@ Connect as a user with permissions (e.g., Azure AD Admin) and run:
 
 ```sql
 -- In the target database
-CREATE USER [user@contoso.com] FROM EXTERNAL PROVIDER;  -- if not already present
-ALTER ROLE db_datareader ADD MEMBER [user@contoso.com];
-ALTER ROLE db_datawriter ADD MEMBER [user@contoso.com];
--- or: ALTER ROLE db_owner ADD MEMBER [user@contoso.com];
+CREATE USER [your-entra-email@domain.com] FROM EXTERNAL PROVIDER;  -- if not already present
+ALTER ROLE db_datareader ADD MEMBER [your-entra-email@domain.com];
+ALTER ROLE db_datawriter ADD MEMBER [your-entra-email@domain.com];
+-- or: ALTER ROLE db_owner ADD MEMBER [your-entra-email@domain.com];
 ```
 
 Ensure your Azure SQL server firewall allows your client (or enable **Allow Azure services** if appropriate for testing).
@@ -32,12 +32,13 @@ Ensure your Azure SQL server firewall allows your client (or enable **Allow Azur
 ## Running in GitHub Codespaces
 1. Create a new repo and push these files, or upload the provided ZIP as the initial commit.
 2. In GitHub, click **Code → Codespaces → Create codespace on `main`**.
+   - Java 17 and Maven will be automatically installed via the `.devcontainer/devcontainer.json` configuration.
 3. Open a terminal and set environment variables (replace values):
 
    ```bash
    export AZURE_SQL_SERVER="yourserver.database.windows.net"
    export AZURE_SQL_DATABASE="yourdb"
-   export AZURE_SQL_USER="user@contoso.com"   # UPN
+   export AZURE_SQL_USER="your-entra-email@domain.com"
    export AZURE_SQL_PASSWORD="<password>"
    export EVENT_NAME="FromCodespaces"
    ```
