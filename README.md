@@ -96,9 +96,17 @@ export JDBC_TRACE="true"
 ./scripts/run.sh
 ```
 
+Optionally, set the trace level (defaults to INFO):
+
+```bash
+export JDBC_TRACE="true"
+export JDBC_TRACE_LEVEL="DEBUG"  # or TRACE, INFO, WARN
+./scripts/run.sh
+```
+
 ### Log levels
 
-You can adjust the logging detail by editing [src/main/resources/logback.xml](src/main/resources/logback.xml):
+You can adjust the logging detail via the `JDBC_TRACE_LEVEL` environment variable or by editing [src/main/resources/logback.xml](src/main/resources/logback.xml):
 
 - **TRACE**: Most detailed - packet-level operations, method entry/exit
 - **DEBUG**: SQL statements, connection events, driver operations

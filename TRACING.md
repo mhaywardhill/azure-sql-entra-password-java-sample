@@ -11,6 +11,14 @@ export JDBC_TRACE="true"
 ./scripts/run.sh
 ```
 
+Set a specific trace level:
+
+```bash
+export JDBC_TRACE="true"
+export JDBC_TRACE_LEVEL="DEBUG"  # Options: INFO, DEBUG, TRACE, WARN
+./scripts/run.sh
+```
+
 ## What Gets Logged
 
 With tracing enabled, you'll see detailed information about:
@@ -19,6 +27,34 @@ With tracing enabled, you'll see detailed information about:
 - Result set operations
 - Driver internal operations
 - Error details and stack traces
+
+## Configuration Methods
+
+You can configure JDBC logging in two ways:
+
+### Method 1: Environment Variables (Recommended)
+
+Set the trace level dynamically without editing configuration files:
+
+```bash
+# Enable tracing at DEBUG level
+export JDBC_TRACE="true"
+export JDBC_TRACE_LEVEL="DEBUG"
+./scripts/run.sh
+
+# Enable tracing at TRACE level for maximum detail
+export JDBC_TRACE="true"
+export JDBC_TRACE_LEVEL="TRACE"
+./scripts/run.sh
+```
+
+**Valid values for JDBC_TRACE_LEVEL:**
+- `TRACE` - Most detailed (FINEST in java.util.logging)
+- `DEBUG` - Detailed operations (FINE in java.util.logging)
+- `INFO` - Basic information (default)
+- `WARN` - Warnings and errors only
+
+### Method 2: Configuration Files
 
 ## Logging Frameworks
 

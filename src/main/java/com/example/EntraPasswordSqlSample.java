@@ -14,6 +14,7 @@ public class EntraPasswordSqlSample {
         
         // Enable JDBC driver logging if JDBC_TRACE is set to true
         String enableTrace = System.getenv().getOrDefault("JDBC_TRACE", "false");
+        String traceLevel = System.getenv().getOrDefault("JDBC_TRACE_LEVEL", "INFO").toUpperCase();
 
         String url = String.format(
             "jdbc:sqlserver://%s:1433;database=%s;encrypt=true;hostNameInCertificate=*.database.windows.net;loginTimeout=30;authentication=ActiveDirectoryPassword",
@@ -26,19 +27,7 @@ public class EntraPasswordSqlSample {
         
         // Configure driver logging level programmatically
         if ("true".equalsIgnoreCase(enableTrace)) {
-            System.out.println("JDBC driver tracing enabled");
-            // The driver uses SLF4J, so logging is controlled via logback.xml
-            // You can also use the java.util.logging properties for alternative configuration
-            try {
-                java.io.InputStream logConfig = EntraPasswordSqlSample.class
-                    .getClassLoader()
-                    .getResourceAsStream("logging.properties");
-                if (logConfig != null) {
-                    java.util.logging.LogManager.getLogManager().readConfiguration(logConfig);
-                }
-            } catch (Exception e) {
-                System.err.println("Could not configure java.util.logging: " + e.getMessage());
-            }
+            configureJdbcLogging(traceLevel);
         }
 
         System.out.println("Connecting to Azure SQL with Entra Password auth...");
@@ -83,6 +72,64 @@ public class EntraPasswordSqlSample {
         try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
             rs.next();
             return rs.getInt(1);
+        }
+    }
+
+    private static void configureJdbcLogging(String level) {
+        System.out.println("JDBC driver tracing enabled at level: " + level);
+        
+        // Configure Logback logger programmatically using reflection to avoid compile-time dependencies
+        try {
+            Class<?> loggerClass = Class.forName("ch.qos.logback.classic.Logger");
+            Class<?> levelClass = Class.forName("ch.qos.logback.classic.Level");
+            
+            Object jdbcLogger = org.slf4j.LoggerFactory.getLogger("com.microsoft.sqlserver.jdbc");
+            
+            Object logbackLevel;
+            switch (level) {
+                case "TRACE":
+                    logbackLevel = levelClass.getField("TRACE").get(null);
+                    break;
+                case "DEBUG":
+                    logbackLevel = levelClass.getField("DEBUG").get(null);
+                    break;
+                case "WARN":
+                case "WARNING":
+                    logbackLevel = levelClass.getField("WARN").get(null);
+                    break;
+                case "INFO":
+                default:
+                    logbackLevel = levelClass.getField("INFO").get(null);
+                    break;
+            }
+            
+            loggerClass.getMethod("setLevel", levelClass).invoke(jdbcLogger, logbackLevel);
+        } catch (Exception e) {
+            System.err.println("Could not configure Logback logging: " + e.getMessage());
+        }
+        
+        // Also configure java.util.logging for alternative logging
+        try {
+            java.util.logging.Level julLevel;
+            switch (level) {
+                case "TRACE":
+                    julLevel = java.util.logging.Level.FINEST;
+                    break;
+                case "DEBUG":
+                    julLevel = java.util.logging.Level.FINE;
+                    break;
+                case "WARN":
+                case "WARNING":
+                    julLevel = java.util.logging.Level.WARNING;
+                    break;
+                case "INFO":
+                default:
+                    julLevel = java.util.logging.Level.INFO;
+                    break;
+            }
+            java.util.logging.Logger.getLogger("com.microsoft.sqlserver.jdbc").setLevel(julLevel);
+        } catch (Exception e) {
+            System.err.println("Could not configure java.util.logging: " + e.getMessage());
         }
     }
 
