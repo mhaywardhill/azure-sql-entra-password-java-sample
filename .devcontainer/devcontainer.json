@@ -1,0 +1,23 @@
+{
+  "name": "Java 17 + Maven (Azure SQL sample)",
+  "image": "mcr.microsoft.com/devcontainers/java:1-17-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "installDocker": false
+    }
+  },
+  "settings": {
+    "java.compile.nullAnalysis.mode": "automatic"
+  },
+  "postCreateCommand": "mvn -q -DskipTests package",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "ms-azuretools.vscode-azureaccount",
+        "ms-azuretools.vscode-azureresourcegroups"
+      ]
+    }
+  }
+}

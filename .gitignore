@@ -1,0 +1,23 @@
+
+# Maven
+target/
+**/target/
+*.log
+
+# IDEs
+.classpath
+.project
+.settings/
+.idea/
+*.iml
+.vscode/settings.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+
+# Devcontainer cache
+.devcontainer/.cache/
