@@ -11,6 +11,9 @@ public class EntraPasswordSqlSample {
         String username = getenvOrFail("AZURE_SQL_USER"); 
         String password = getenvOrFail("AZURE_SQL_PASSWORD");
         String eventName = System.getenv().getOrDefault("EVENT_NAME", "HelloFromJava");
+        
+        // Enable JDBC driver logging if JDBC_TRACE is set to true
+        String enableTrace = System.getenv().getOrDefault("JDBC_TRACE", "false");
 
         String url = String.format(
             "jdbc:sqlserver://%s:1433;database=%s;encrypt=true;hostNameInCertificate=*.database.windows.net;loginTimeout=30;authentication=ActiveDirectoryPassword",
@@ -20,6 +23,23 @@ public class EntraPasswordSqlSample {
         Properties props = new Properties();
         props.setProperty("user", username);
         props.setProperty("password", password);
+        
+        // Configure driver logging level programmatically
+        if ("true".equalsIgnoreCase(enableTrace)) {
+            System.out.println("JDBC driver tracing enabled");
+            // The driver uses SLF4J, so logging is controlled via logback.xml
+            // You can also use the java.util.logging properties for alternative configuration
+            try {
+                java.io.InputStream logConfig = EntraPasswordSqlSample.class
+                    .getClassLoader()
+                    .getResourceAsStream("logging.properties");
+                if (logConfig != null) {
+                    java.util.logging.LogManager.getLogManager().readConfiguration(logConfig);
+                }
+            } catch (Exception e) {
+                System.err.println("Could not configure java.util.logging: " + e.getMessage());
+            }
+        }
 
         System.out.println("Connecting to Azure SQL with Entra Password auth...");
         try (Connection conn = DriverManager.getConnection(url, props)) {

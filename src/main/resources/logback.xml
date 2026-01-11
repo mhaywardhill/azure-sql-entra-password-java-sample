@@ -13,4 +13,12 @@
     <!-- Suppress verbose logging from Azure SDK and MSAL -->
     <logger name="com.microsoft" level="WARN"/>
     <logger name="com.azure" level="WARN"/>
+    
+    <!-- SQL Server JDBC Driver logging 
+         Set to TRACE for detailed driver operations
+         Set to DEBUG for SQL statements and connection events
+         Set to INFO for basic driver information
+         Set to WARN to suppress most driver logging
+    -->
+    <logger name="com.microsoft.sqlserver.jdbc" level="INFO"/>
 </configuration>

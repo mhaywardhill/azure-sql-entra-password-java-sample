@@ -43,6 +43,11 @@ Ensure your Azure SQL server firewall allows your client (or enable **Allow Azur
    export EVENT_NAME="FromCodespaces"
    ```
 
+   Optional: Enable JDBC driver tracing for debugging connection issues:
+   ```bash
+   export JDBC_TRACE="true"
+   ```
+
 4. Run:
    ```bash
    ./scripts/run.sh
@@ -75,6 +80,43 @@ jdbc:sqlserver://<server>:1433;database=<db>;encrypt=true;hostNameInCertificate=
 ```
 
 Credentials are supplied via the standard `user` and `password` JDBC properties (the `user` must be a UPN). TLS is enforced with `encrypt=true`.
+
+## JDBC Driver Tracing
+
+This sample includes support for SQL Server JDBC driver tracing to help debug connection issues and observe driver operations. The driver uses **SLF4J** for logging, with **Logback** as the implementation.
+
+**📖 For detailed tracing configuration and usage, see [TRACING.md](TRACING.md)**
+
+### Enabling tracing
+
+Set the `JDBC_TRACE` environment variable to `true`:
+
+```bash
+export JDBC_TRACE="true"
+./scripts/run.sh
+```
+
+### Log levels
+
+You can adjust the logging detail by editing [src/main/resources/logback.xml](src/main/resources/logback.xml):
+
+- **TRACE**: Most detailed - packet-level operations, method entry/exit
+- **DEBUG**: SQL statements, connection events, driver operations
+- **INFO**: Basic driver information (default)
+- **WARN**: Warnings and errors only
+
+Example configuration in logback.xml:
+
+```xml
+<!-- Set to TRACE for detailed driver operations -->
+<logger name="com.microsoft.sqlserver.jdbc" level="TRACE"/>
+```
+
+### Alternative: Java Util Logging
+
+The driver also supports java.util.logging. A configuration file is provided at [src/main/resources/logging.properties](src/main/resources/logging.properties). This is automatically used when `JDBC_TRACE=true` is set.
+
+For more information, see [Microsoft's documentation on tracing driver operations](https://learn.microsoft.com/en-us/sql/connect/jdbc/tracing-driver-operation).
 
 ## Troubleshooting
 - **MFA required / Conditional Access**: `ActiveDirectoryPassword` does **not** support MFA. Use a non-MFA test user, exclude the user from the MFA policy, or switch to **Managed Identity / Service Principal + access token** authentication.
