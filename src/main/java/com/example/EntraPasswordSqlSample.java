@@ -83,15 +83,26 @@ public class EntraPasswordSqlSample {
         try {
             java.util.logging.Level julLevel;
             switch (level) {
-                case "TRACE":
+                case "FINEST":
                     julLevel = java.util.logging.Level.FINEST;
                     break;
-                case "DEBUG":
+                case "FINER":
+                    julLevel = java.util.logging.Level.FINER;
+                    break;
+                case "FINE":
                     julLevel = java.util.logging.Level.FINE;
                     break;
-                case "WARN":
                 case "WARNING":
                     julLevel = java.util.logging.Level.WARNING;
+                    break;
+                case "SEVERE":
+                    julLevel = java.util.logging.Level.SEVERE;
+                    break;
+                case "OFF":
+                    julLevel = java.util.logging.Level.OFF;
+                    break;
+                case "ALL":
+                    julLevel = java.util.logging.Level.ALL;
                     break;
                 case "INFO":
                 default:

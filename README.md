@@ -83,7 +83,7 @@ Credentials are supplied via the standard `user` and `password` JDBC properties 
 
 ## JDBC Driver Tracing
 
-This sample includes support for SQL Server JDBC driver tracing to help debug connection issues and observe driver operations. The driver uses **SLF4J** for logging, with **Logback** as the implementation.
+This sample includes support for SQL Server JDBC driver tracing to help debug connection issues and observe driver operations. The driver uses **java.util.logging** for tracing operations.
 
 **📖 For detailed tracing configuration and usage, see [TRACING.md](TRACING.md)**
 
@@ -100,18 +100,22 @@ Optionally, set the trace level (defaults to INFO):
 
 ```bash
 export JDBC_TRACE="true"
-export JDBC_TRACE_LEVEL="DEBUG"  # or TRACE, INFO, WARN
+export JDBC_TRACE_LEVEL="FINE"  # or FINEST, FINER, FINE, INFO, WARNING, SEVERE
 ./scripts/run.sh
 ```
 
 ### Log levels
 
-You can adjust the logging detail via the `JDBC_TRACE_LEVEL` environment variable:
+You can adjust the logging detail via the `JDBC_TRACE_LEVEL` environment variable using standard java.util.logging levels:
 
-- **TRACE**: Most detailed - packet-level operations, method entry/exit
-- **DEBUG**: SQL statements, connection events, driver operations
-- **INFO**: Basic driver information (default)
-- **WARN**: Warnings and errors only
+- **FINEST**: Most detailed tracing - packet-level details (lowest level)
+- **FINER**: Detailed method entry/exit and all public method parameters
+- **FINE**: Basic object creation/destruction, exceptions from public methods
+- **INFO**: Informational messages (default)
+- **WARNING**: Indicates potential problems
+- **SEVERE**: Serious failures, errors and exceptions (highest level)
+- **OFF**: Turns off logging
+- **ALL**: Enables logging of all messages
 
 The application uses Java Util Logging (java.util.logging) and configures it programmatically when `JDBC_TRACE=true` is set. For more information, see [Microsoft's documentation on tracing driver operations](https://learn.microsoft.com/en-us/sql/connect/jdbc/tracing-driver-operation).
 
